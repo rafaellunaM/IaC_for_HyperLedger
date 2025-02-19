@@ -28,6 +28,7 @@ resource "aws_default_security_group" "default" {
         self      = true
         from_port = 0
         to_port   = 0
+        cidr_blocks = ["0.0.0.0/0"]
     }
 
     egress {
@@ -76,7 +77,7 @@ resource "aws_key_pair" "deployer" {
 
 resource "aws_instance" "ec2_public" {
   count         = 5
-  ami           = "ami-0bb84b8ffd87024d8"
+  ami           = "ami-04b4f1a9cf54c11d0"
   instance_type = "t2.medium"
   associate_public_ip_address = true
   subnet_id = aws_subnet.subnet_public.id
@@ -85,4 +86,8 @@ resource "aws_instance" "ec2_public" {
   tags = {
     Name = "k8s-instance-${count.index}"
   }
+}
+
+output "ec2_public_ips" {
+  value = [for instance in aws_instance.ec2_public : instance.public_ip]
 }
