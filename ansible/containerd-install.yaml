@@ -1,5 +1,5 @@
 - name: setup to install k8s on ubuntu 24.04
-  hosts: control-plane 
+  hosts: all
   become: true
   tasks:
 

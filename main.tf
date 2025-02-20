@@ -1,5 +1,12 @@
+locals {
+  access_aws = chomp(regex("AWS_ACCESS_KEY_ID=(.*)", file("aws.env"))[0])
+  secret_aws = chomp(regex("AWS_SECRET_ACCESS_KEY=(.*)", file("aws.env"))[0])
+}
+
 provider "aws" {
   region = "us-east-1"  
+  access_key = local.access_aws
+  secret_key = local.secret_aws
 }
 
 resource "aws_vpc" "default_vpc"{
@@ -82,12 +89,19 @@ resource "aws_instance" "ec2_public" {
   associate_public_ip_address = true
   subnet_id = aws_subnet.subnet_public.id
   key_name = aws_key_pair.deployer.id
+  # private_ip = "10.0.0.10${tostring(count.index)}"
 
   tags = {
     Name = "k8s-instance-${count.index}"
   }
 }
 
-output "ec2_public_ips" {
+output "ec2_public_ips_output" {
   value = [for instance in aws_instance.ec2_public : instance.public_ip]
+}
+
+resource "local_file" "ec2_public_ips_file" {
+  
+  content  = join("\n", [for instance in aws_instance.ec2_public : instance.public_ip])
+  filename = "ec2_public_ips.txt"
 }
