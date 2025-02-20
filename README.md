@@ -14,4 +14,3 @@
 * ansible-playbook -i hosts.ini ./nsible/containerd-install.yaml
 * ansible-playbook -i hosts.ini ./ansible/control-plane.yaml
 * ansible-playbook -i hosts.ini ./ansible/workers.yaml.yaml
-* kubectl label nodes ip-10-0-0-80 node-role.kubernetes.io/worker=
