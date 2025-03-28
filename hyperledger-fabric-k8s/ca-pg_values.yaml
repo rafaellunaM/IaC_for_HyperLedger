@@ -1,0 +1,21 @@
+imageTag: "16.4"
+
+postgresDatabase: fabric_ca
+
+primary:
+  persistence:
+    size: 1Gi
+    storageClass: "fast-disks"
+
+  service:
+    type: NodePort
+
+affinity:
+  podAntiAffinity:
+    preferredDuringSchedulingIgnoredDuringExecution:
+      - weight: 95
+        podAffinityTerm: 
+          topologyKey: "kubernetes.io/hostname"
+          labelSelector:
+            matchLabels:
+              app: postgresql

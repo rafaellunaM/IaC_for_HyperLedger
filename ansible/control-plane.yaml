@@ -31,7 +31,7 @@
       command: apt-mark hold kubelet kubeadm kubectl
 
     - name: Initialize Kubernetes cluster
-      command: kubeadm init
+      command: kubeadm init --pod-network-cidr=10.244.0.0/16
       args:
         creates: /etc/kubernetes/admin.conf
 
@@ -60,17 +60,15 @@
         path: /run/flannel
         state: directory
 
-    - name: creating file subnet.env
-      copy:
-        dest: "/run/flannel/subnet.env"
-        content: |
-          FLANNEL_NETWORK=10.244.0.0/16
-          FLANNEL_SUBNET=10.244.0.1/24
-          FLANNEL_MTU=1450
-          FLANNEL_IPMASQ=true
-      become: true
-
     - name: Restart Containerd to apply changes
       systemd:
         name: containerd
         state: restarted
+
+    - name: Copiar ingress-nginx
+      copy:
+        src: ./configs-k8s/ingress-nginx.yaml
+        dest: /tmp/ingress-nginx.yaml
+
+    - name: Aplicar ingress-nginx
+      shell: kubectl apply -f /tmp/ingress-nginx.yaml

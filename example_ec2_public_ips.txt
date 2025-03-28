@@ -1,0 +1,5 @@
+This file after "terraform apply"
+x.x.x.x
+y.y.y.y
+z.z.z.z
+a.a.a.a
