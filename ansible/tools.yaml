@@ -1,0 +1,33 @@
+- name: install and deploy tools for k8s cluster
+  hosts: control_plane
+  become: true
+  tasks:
+    - name: Copy ingress-nginx yaml
+      copy:
+        src: ./configs-k8s/ingress-nginx.yaml
+        dest: /tmp/ingress-nginx.yaml
+
+    - name: apply ingress-nginx
+      shell: kubectl apply -f /tmp/ingress-nginx.yaml
+      environment:
+        KUBECONFIG: /home/ubuntu/.kube/config
+
+    - name: Install cert-manager
+      shell: kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.17.0/cert-manager.yaml
+      args:
+        creates: /etc/kubernetes/manifests/cert-manager.yaml
+      environment:
+        KUBECONFIG: /home/ubuntu/.kube/config
+
+    - name: Download Helm install script
+      get_url:
+        url: https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3
+        dest: /tmp/get_helm.sh
+        mode: '0755'
+
+    - name: Install Helm
+      shell: |
+        chmod 700 /tmp/get_helm.sh
+        /tmp/get_helm.sh
+      args:
+        creates: /usr/local/bin/helm

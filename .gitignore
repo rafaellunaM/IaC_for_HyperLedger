@@ -1,4 +1,3 @@
 aws.env
 .terraform
-./ansible/hosts.ini
 ec2_public_ips.txt
