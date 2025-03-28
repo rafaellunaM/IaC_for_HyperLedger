@@ -1,0 +1,11 @@
+- name: Install and start k8s
+  hosts: control_plane
+  become: yes
+  tasks:
+    - name: copy files to control-plane
+      copy:
+        src: volumes/
+        dest: /tmp/
+        owner: ubuntu
+        group: ubuntu
+        mode: '0755'

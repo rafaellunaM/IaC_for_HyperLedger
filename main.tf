@@ -89,7 +89,7 @@ resource "aws_instance" "ec2_public" {
   associate_public_ip_address = true
   subnet_id = aws_subnet.subnet_public.id
   key_name = aws_key_pair.deployer.id
-  # private_ip = "10.0.0.10${tostring(count.index)}"
+  private_ip = "10.0.0.10${tostring(count.index)}"
 
   tags = {
     Name = "k8s-instance-${count.index}"

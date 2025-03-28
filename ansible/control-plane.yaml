@@ -64,11 +64,3 @@
       systemd:
         name: containerd
         state: restarted
-
-    - name: Copiar ingress-nginx
-      copy:
-        src: ./configs-k8s/ingress-nginx.yaml
-        dest: /tmp/ingress-nginx.yaml
-
-    - name: Aplicar ingress-nginx
-      shell: kubectl apply -f /tmp/ingress-nginx.yaml
