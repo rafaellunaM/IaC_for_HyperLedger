@@ -1,12 +1,10 @@
 imageTag: "16.4"
-
 postgresDatabase: fabric_ca
 
 primary:
   persistence:
-    size: 1Gi
     storageClass: "fast-disks"
-
+    size: 1Gi
   service:
     type: NodePort
 

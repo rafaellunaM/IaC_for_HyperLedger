@@ -12,15 +12,16 @@ To get the password for "postgres" run:
 
 To connect to your database run the following command:
 
-    kubectl run ca-pg-postgresql-client --rm --tty -i --restart='Never' --namespace blockchain --image docker.io/bitnami/postgresql:17.4.0-debian-12-r2 --env="PGPASSWORD=$POSTGRES_PASSWORD" \
+    kubectl run ca-pg-postgresql-client --rm --tty -i --restart='Never' --namespace blockchain --image docker.io/bitnami/postgresql:17.4.0-debian-12-r11 --env="PGPASSWORD=$POSTGRES_PASSWORD" \
       --command -- psql --host ca-pg-postgresql -U postgres -d postgres -p 5432
 
     > NOTE: If you access the container using bash, make sure that you execute "/opt/bitnami/scripts/postgresql/entrypoint.sh /bin/bash" in order to avoid the error "psql: local user with ID 1001} does not exist"
 
 To connect to your database from outside the cluster execute the following commands:
 
-    kubectl port-forward --namespace blockchain svc/ca-pg-postgresql 5432:5432 &
-    PGPASSWORD="$POSTGRES_PASSWORD" psql --host 127.0.0.1 -U postgres -d postgres -p 5432
+    export NODE_IP=$(kubectl get nodes --namespace blockchain -o jsonpath="{.items[0].status.addresses[0].address}")
+    export NODE_PORT=$(kubectl get --namespace blockchain -o jsonpath="{.spec.ports[0].nodePort}" services ca-pg-postgresql)
+    PGPASSWORD="$POSTGRES_PASSWORD" psql --host $NODE_IP --port $NODE_PORT -U postgres -d postgres
 
 WARNING: The configured password will be ignored on new installation in case when previous PostgreSQL release was deleted through the helm command. In that case, old PVC will have an old password, and setting it through helm won't take effect. Deleting persistent volumes (PVs) will solve the issue.
 

@@ -18,3 +18,10 @@
 # setup HLF
 * cd hyperledger-fabric-k8s
 * 
+
+# To Do
+* better makefile for start terraform and ansible, "makefile start = terraform apply and ansible playbooks"
+* Install ebs aws driver in the k8s cluster and add it on the ansible playbook
+* deployment postgres for hyperledger fabric
+* deployment components of hyperledger fabric
+*

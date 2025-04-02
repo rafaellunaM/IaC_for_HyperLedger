@@ -81,6 +81,51 @@ resource "aws_key_pair" "deployer" {
   key_name   = "deployer-key"
   public_key = file("~/.ssh/id_rsa.pub")
 }
+resource "aws_iam_role" "k8s_role" {
+  name = "k8s_ebs_volume"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Principal = {
+          Service = "ec2.amazonaws.com"
+        }
+        Action = "sts:AssumeRole"
+      }
+    ]
+  })
+}
+
+resource "aws_iam_policy" "k8s_ebs_policy" {
+  name        = "k8s_ebs_policy"
+  description = "Permissões para gerenciar volumes EBS"
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "ec2:CreateVolume",
+          "ec2:AttachVolume",
+          "ec2:DetachVolume",
+          "ec2:DeleteVolume",
+          "ec2:DescribeVolumes",
+          "ec2:CreateSnapshot",
+          "ec2:DeleteSnapshot",
+          "ec2:DescribeSnapshots"
+        ]
+        Resource = "*"
+      }
+    ]
+  })
+}
+
+resource "aws_iam_instance_profile" "k8s_instance_profile" {
+  name = "k8s_instance_profile"
+  role = aws_iam_role.k8s_role.name
+}
 
 resource "aws_instance" "ec2_public" {
   count         = 5
@@ -91,6 +136,7 @@ resource "aws_instance" "ec2_public" {
   key_name = aws_key_pair.deployer.id
   private_ip = "10.0.0.10${tostring(count.index)}"
 
+  iam_instance_profile = aws_iam_instance_profile.k8s_instance_profile.name 
   tags = {
     Name = "k8s-instance-${count.index}"
   }

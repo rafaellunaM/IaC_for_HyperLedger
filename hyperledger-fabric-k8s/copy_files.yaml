@@ -1,11 +1,21 @@
-- name: Install and start k8s
+- name: deployment sc, pvc and pv
   hosts: control_plane
   become: yes
   tasks:
+    - name: create a dir
+      file:
+        path: $HOME/storage
+        state: directory
+
     - name: copy files to control-plane
       copy:
         src: volumes/
-        dest: /tmp/
+        dest: $HOME/storage
         owner: ubuntu
         group: ubuntu
         mode: '0755'
+
+    - name: apply storage class and pvc
+      shell: kubectl apply -f $HOME/storage
+      environment:
+        KUBECONFIG: /home/ubuntu/.kube/config

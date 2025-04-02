@@ -7,7 +7,7 @@ INSTAL_TOOLS_PLAYBOOK = ansible-playbook -i hosts.ini tools.yaml
 
 ANSIBLE_SSH_ARGS = "-o StrictHostKeyChecking=no"
 
-all: create_ini containerd control-plane workers create-disk install-tools
+all: create_ini containerd control-plane workers install-tools
 
 create_ini:
 	$(CREATE_INI_FILE)
@@ -20,9 +20,6 @@ control-plane:
 
 workers:
 	ANSIBLE_SSH_ARGS=$(ANSIBLE_SSH_ARGS) $(WORKERS_PLAYBOOK)
-
-create-disk:
-	ANSIBLE_SSH_ARGS=$(ANSIBLE_SSH_ARGS) $(CREATE_DISK_PLAYBOOK)
 
 install-tools:
 	ANSIBLE_SSH_ARGS=$(ANSIBLE_SSH_ARGS) $(INSTAL_TOOLS_PLAYBOOK)
