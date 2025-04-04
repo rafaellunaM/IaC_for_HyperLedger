@@ -31,3 +31,29 @@
         /tmp/get_helm.sh
       args:
         creates: /usr/local/bin/helm
+
+    - name: Add aws-ebs-csi-driver
+      kubernetes.core.helm_repository:
+        name: ebs-csi
+        repo_url: "https://kubernetes-sigs.github.io/aws-ebs-csi-driver"
+        kubeconfig_path: /home/ubuntu/.kube/config
+
+    - name: Deploy aws-ebs-csi-driver
+      kubernetes.core.helm:
+        name: ebs-csi
+        chart_ref: ebs-csi/aws-ebs-csi-driver
+        release_namespace: kube-system
+        kubeconfig_path: /home/ubuntu/.kube/config
+
+    - name: Copy sc and pvc yamls
+      ansible.builtin.copy:
+        src: ./configs-k8s
+        dest: /tmp/volumes_containers
+        owner: root
+        group: root
+        mode: '0644'
+
+    - name: apply sc and pvc
+      shell: kubectl apply -f /tmp/volumes_containers/*
+      environment:
+        KUBECONFIG: /home/ubuntu/.kube/config

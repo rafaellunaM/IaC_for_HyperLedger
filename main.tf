@@ -81,6 +81,7 @@ resource "aws_key_pair" "deployer" {
   key_name   = "deployer-key"
   public_key = file("~/.ssh/id_rsa.pub")
 }
+
 resource "aws_iam_role" "k8s_role" {
   name = "k8s_ebs_volume"
 
@@ -114,7 +115,12 @@ resource "aws_iam_policy" "k8s_ebs_policy" {
           "ec2:DescribeVolumes",
           "ec2:CreateSnapshot",
           "ec2:DeleteSnapshot",
-          "ec2:DescribeSnapshots"
+          "ec2:DescribeSnapshots",
+          "ec2:CreateTags",
+          "ec2:DescribeInstances",
+          "ec2:ModifyVolume",
+          "ec2:DescribeVolumeAttribute",
+          "ec2:DescribeInstanceStatus"
         ]
         Resource = "*"
       }
@@ -125,6 +131,11 @@ resource "aws_iam_policy" "k8s_ebs_policy" {
 resource "aws_iam_instance_profile" "k8s_instance_profile" {
   name = "k8s_instance_profile"
   role = aws_iam_role.k8s_role.name
+}
+
+resource "aws_iam_role_policy_attachment" "k8s_policy_attachment" {
+  role       = aws_iam_role.k8s_role.name
+  policy_arn = aws_iam_policy.k8s_ebs_policy.arn
 }
 
 resource "aws_instance" "ec2_public" {
